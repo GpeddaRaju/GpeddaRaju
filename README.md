@@ -1,595 +1,789 @@
-# 🚀 Enterprise Microservices Architecture
-
-[![Java](https://img.shields.io/badge/Java-17+-orange.svg)](https://www.oracle.com/java/)
-[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2+-green.svg)](https://spring.io/projects/spring-boot)
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
-
-> A scalable, production-ready microservices architecture built with Java, Spring Boot, and Spring Cloud ecosystem.
-
-**Designed & Developed by:** [Gadige Peddaraju](https://github.com/yourusername)  
-**Tech Stack:** Java, Spring Boot, Oracle, Docker, Kubernetes
-
----
-
-## 📋 Table of Contents
-
-- [Overview](#overview)
-- [Architecture](#architecture)
-- [Microservices](#microservices)
-- [Technology Stack](#technology-stack)
-- [Getting Started](#getting-started)
-- [API Documentation](#api-documentation)
-- [Deployment](#deployment)
-- [Monitoring & Observability](#monitoring--observability)
-- [Contributing](#contributing)
-- [License](#license)
-
----
-
-## 🎯 Overview
-
-This project demonstrates a **production-grade microservices architecture** implementing industry best practices for building scalable, resilient, and maintainable distributed systems. It showcases:
-
-✅ **Service Discovery** with Netflix Eureka  
-✅ **API Gateway** for centralized routing & authentication  
-✅ **Distributed Configuration** with Spring Cloud Config  
-✅ **Inter-service Communication** via REST & messaging  
-✅ **Containerization** with Docker & orchestration with Kubernetes  
-✅ **Observability** through monitoring, logging, and tracing  
-✅ **Security** with JWT-based authentication & authorization  
-
----
-
-## 🏗️ Architecture
-
-### System Architecture Diagram
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                        Client Layer                          │
-│              (Web, Mobile, Third-party Apps)                 │
-└────────────────────┬────────────────────────────────────────┘
-                     │
-                     ▼
-┌─────────────────────────────────────────────────────────────┐
-│                      API Gateway                             │
-│         (Routing, Auth, Rate Limiting, Load Balancing)       │
-└─┬──────────┬──────────┬──────────┬──────────┬──────────────┘
-  │          │          │          │          │
-  ▼          ▼          ▼          ▼          ▼
-┌───────┐ ┌────────┐ ┌───────┐ ┌─────────┐ ┌──────────────┐
-│ User  │ │Product │ │ Order │ │ Payment │ │Notification  │
-│Service│ │Service │ │Service│ │ Service │ │   Service    │
-└───┬───┘ └───┬────┘ └───┬───┘ └────┬────┘ └──────┬───────┘
-    │         │          │          │             │
-    ▼         ▼          ▼          ▼             ▼
-┌────────┐ ┌────────┐ ┌────────┐ ┌────────┐  ┌─────────┐
-│User DB │ │Prod DB │ │Order DB│ │Pay DB  │  │ Kafka/  │
-│(Oracle)│ │(MySQL) │ │(Oracle)│ │(Oracle)│  │RabbitMQ │
-└────────┘ └────────┘ └────────┘ └────────┘  └─────────┘
-     │          │          │          │            │
-     └──────────┴──────────┴──────────┴────────────┘
-                         │
-                         ▼
-            ┌──────────────────────────┐
-            │  Infrastructure Layer     │
-            ├──────────────────────────┤
-            │ • Service Discovery       │
-            │ • Config Server          │
-            │ • Redis Cache            │
-            │ • Monitoring (Prometheus)│
-            │ • Logging (ELK Stack)    │
-            └──────────────────────────┘
-```
-
-### Key Design Patterns
-
-- **API Gateway Pattern**: Single entry point for all clients
-- **Database per Service**: Each microservice owns its database
-- **Event-Driven Architecture**: Asynchronous communication via message queues
-- **Circuit Breaker**: Resilience4j for fault tolerance
-- **CQRS**: Separate read/write operations for scalability
-- **Saga Pattern**: Distributed transaction management
-
----
-
-## 🔧 Microservices
-
-### 1. **API Gateway Service**
-- **Port**: 8080
-- **Responsibilities**: 
-  - Request routing to appropriate microservices
-  - Authentication & authorization (JWT validation)
-  - Rate limiting & throttling
-  - Load balancing
-- **Tech**: Spring Cloud Gateway, JWT
-
-### 2. **User Service**
-- **Port**: 8081
-- **Responsibilities**: 
-  - User registration & authentication
-  - Profile management
-  - Role-based access control (RBAC)
-  - Password encryption (BCrypt)
-- **Database**: Oracle / PostgreSQL
-- **Endpoints**:
-  - `POST /api/users/register` - Register new user
-  - `POST /api/users/login` - User authentication
-  - `GET /api/users/{id}` - Get user profile
-  - `PUT /api/users/{id}` - Update user profile
-
-### 3. **Product Service**
-- **Port**: 8082
-- **Responsibilities**: 
-  - Product catalog management
-  - Inventory tracking
-  - Product search & filtering
-  - Category management
-- **Database**: MySQL / Oracle
-- **Caching**: Redis for frequently accessed products
-- **Endpoints**:
-  - `GET /api/products` - Get all products (paginated)
-  - `GET /api/products/{id}` - Get product details
-  - `POST /api/products` - Create product (Admin)
-  - `PUT /api/products/{id}` - Update product (Admin)
-  - `DELETE /api/products/{id}` - Delete product (Admin)
-
-### 4. **Order Service**
-- **Port**: 8083
-- **Responsibilities**: 
-  - Order creation & validation
-  - Order status management
-  - Inventory reservation
-  - Integration with Payment & Notification services
-- **Database**: PostgreSQL / Oracle
-- **Messaging**: Kafka for order events
-- **Endpoints**:
-  - `POST /api/orders` - Create new order
-  - `GET /api/orders/{id}` - Get order details
-  - `GET /api/orders/user/{userId}` - Get user orders
-  - `PUT /api/orders/{id}/status` - Update order status
-
-### 5. **Payment Service**
-- **Port**: 8084
-- **Responsibilities**: 
-  - Payment processing
-  - Payment gateway integration (Stripe, PayPal, Razorpay)
-  - Transaction history
-  - Refund management
-- **Database**: Oracle
-- **Security**: PCI-DSS compliant
-- **Endpoints**:
-  - `POST /api/payments/process` - Process payment
-  - `GET /api/payments/{id}` - Get payment details
-  - `POST /api/payments/{id}/refund` - Initiate refund
-
-### 6. **Notification Service**
-- **Port**: 8085
-- **Responsibilities**: 
-  - Email notifications (via SendGrid/SMTP)
-  - SMS notifications (via Twilio)
-  - Push notifications
-  - Event-driven notifications
-- **Messaging**: Kafka consumer for order/payment events
-- **Endpoints**:
-  - `POST /api/notifications/email` - Send email
-  - `POST /api/notifications/sms` - Send SMS
-
----
-
-## 💻 Technology Stack
-
-### Backend
-- **Java**: 17+ (LTS)
-- **Spring Boot**: 3.2+
-- **Spring Cloud**: 2023.x
-- **Spring Data JPA**: Database interactions
-- **Hibernate**: ORM
-- **Maven**: Build & dependency management
-
-### Databases
-- **Oracle**: Primary relational database
-- **PostgreSQL**: Alternative RDBMS
-- **MySQL**: Product catalog
-- **MongoDB**: Document store (optional)
-- **Redis**: In-memory cache & session store
-
-### Messaging
-- **Apache Kafka**: Event streaming
-- **RabbitMQ**: Message queue (alternative)
-
-### Security
-- **Spring Security**: Authentication & authorization
-- **JWT**: Stateless authentication tokens
-- **OAuth 2.0**: Third-party authentication
-- **BCrypt**: Password hashing
-
-### DevOps & Infrastructure
-- **Docker**: Containerization
-- **Kubernetes**: Container orchestration
-- **Jenkins**: CI/CD pipeline
-- **Git**: Version control
-- **Nginx**: Reverse proxy & load balancing
-
-### Monitoring & Logging
-- **Prometheus**: Metrics collection
-- **Grafana**: Metrics visualization
-- **ELK Stack**: Centralized logging
-  - Elasticsearch: Log storage
-  - Logstash: Log processing
-  - Kibana: Log visualization
-- **Zipkin/Jaeger**: Distributed tracing
-
-### Testing
-- **JUnit 5**: Unit testing
-- **Mockito**: Mocking framework
-- **TestContainers**: Integration testing
-- **Postman**: API testing
-
----
-
-## 🚀 Getting Started
-
-### Prerequisites
-
-```bash
-# Required software
-- Java 17 or higher
-- Maven 3.8+
-- Docker & Docker Compose
-- Kubernetes (Minikube/Kind for local)
-- Oracle Database (or PostgreSQL)
-- Redis
-- Kafka
-```
-
-### Installation
-
-1. **Clone the repository**
-```bash
-git clone https://github.com/yourusername/microservices-architecture.git
-cd microservices-architecture
-```
-
-2. **Build all services**
-```bash
-mvn clean install -DskipTests
-```
-
-3. **Start infrastructure services using Docker Compose**
-```bash
-docker-compose up -d
-```
-
-This will start:
-- Eureka Server (http://localhost:8761)
-- Config Server (http://localhost:8888)
-- Kafka & Zookeeper
-- Redis
-- Databases (Oracle, MySQL, PostgreSQL)
-
-4. **Run individual microservices**
-
-```bash
-# User Service
-cd user-service
-mvn spring-boot:run
-
-# Product Service
-cd product-service
-mvn spring-boot:run
-
-# Order Service
-cd order-service
-mvn spring-boot:run
-
-# Payment Service
-cd payment-service
-mvn spring-boot:run
-
-# Notification Service
-cd notification-service
-mvn spring-boot:run
-
-# API Gateway
-cd api-gateway
-mvn spring-boot:run
-```
-
-5. **Access the application**
-- API Gateway: http://localhost:8080
-- Eureka Dashboard: http://localhost:8761
-- Config Server: http://localhost:8888
-
----
-
-## 📚 API Documentation
-
-### Authentication
-
-All protected endpoints require JWT token in the Authorization header:
-
-```http
-Authorization: Bearer <your-jwt-token>
-```
-
-### Sample API Requests
-
-#### 1. User Registration
-```bash
-curl -X POST http://localhost:8080/api/users/register \
-  -H "Content-Type: application/json" \
-  -d '{
-    "username": "johndoe",
-    "email": "john@example.com",
-    "password": "SecurePass123",
-    "firstName": "John",
-    "lastName": "Doe"
-  }'
-```
-
-#### 2. User Login
-```bash
-curl -X POST http://localhost:8080/api/users/login \
-  -H "Content-Type: application/json" \
-  -d '{
-    "username": "johndoe",
-    "password": "SecurePass123"
-  }'
-```
-
-#### 3. Get Products
-```bash
-curl -X GET http://localhost:8080/api/products?page=0&size=10 \
-  -H "Authorization: Bearer <token>"
-```
-
-#### 4. Create Order
-```bash
-curl -X POST http://localhost:8080/api/orders \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <token>" \
-  -d '{
-    "userId": 1,
-    "items": [
-      {"productId": 101, "quantity": 2},
-      {"productId": 102, "quantity": 1}
-    ],
-    "shippingAddress": "123 Main St, City, Country"
-  }'
-```
-
-**Full API Documentation**: Available at http://localhost:8080/swagger-ui.html
-
----
-
-## 🐳 Deployment
-
-### Docker Deployment
-
-Build Docker images for all services:
-
-```bash
-# Build images
-docker build -t user-service:1.0 ./user-service
-docker build -t product-service:1.0 ./product-service
-docker build -t order-service:1.0 ./order-service
-docker build -t payment-service:1.0 ./payment-service
-docker build -t notification-service:1.0 ./notification-service
-docker build -t api-gateway:1.0 ./api-gateway
-
-# Run with Docker Compose
-docker-compose up -d
-```
-
-### Kubernetes Deployment
-
-```bash
-# Create namespace
-kubectl create namespace microservices
-
-# Deploy infrastructure
-kubectl apply -f k8s/infrastructure/
-
-# Deploy services
-kubectl apply -f k8s/services/
-
-# Verify deployments
-kubectl get pods -n microservices
-kubectl get services -n microservices
-```
-
-### Environment Variables
-
-Create `.env` file for each service:
-
-```env
-# Database Configuration
-DB_HOST=localhost
-DB_PORT=1521
-DB_NAME=microservicesdb
-DB_USERNAME=admin
-DB_PASSWORD=secure_password
-
-# Redis Configuration
-REDIS_HOST=localhost
-REDIS_PORT=6379
-
-# Kafka Configuration
-KAFKA_BOOTSTRAP_SERVERS=localhost:9092
-
-# JWT Configuration
-JWT_SECRET=your-secret-key-here
-JWT_EXPIRATION=86400000
-
-# Email Configuration
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=587
-SMTP_USERNAME=your-email@gmail.com
-SMTP_PASSWORD=your-password
-```
-
----
-
-## 📊 Monitoring & Observability
-
-### Prometheus Metrics
-Access metrics at: http://localhost:9090
-
-Key metrics monitored:
-- Request rate & latency
-- Error rates (4xx, 5xx)
-- JVM memory & CPU usage
-- Database connection pool stats
-- Cache hit/miss ratio
-
-### Grafana Dashboards
-Access dashboards at: http://localhost:3000 (admin/admin)
-
-Pre-configured dashboards:
-- Service health overview
-- API Gateway metrics
-- Database performance
-- Kafka consumer lag
-- JVM monitoring
-
-### Centralized Logging (ELK)
-Access Kibana at: http://localhost:5601
-
-Log aggregation from all services with:
-- Request/response logs
-- Error stack traces
-- Performance metrics
-- Audit logs
-
-### Distributed Tracing
-Access Zipkin at: http://localhost:9411
-
-Trace requests across microservices to identify:
-- Latency bottlenecks
-- Service dependencies
-- Error propagation
-
----
-
-## 🧪 Testing
-
-### Run Unit Tests
-```bash
-mvn test
-```
-
-### Run Integration Tests
-```bash
-mvn verify -P integration-tests
-```
-
-### Run All Tests with Coverage
-```bash
-mvn clean verify jacoco:report
-```
-
-View coverage report at: `target/site/jacoco/index.html`
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome! Please follow these steps:
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-Please ensure:
-- Code follows Java coding standards
-- All tests pass
-- Documentation is updated
-- Commit messages are descriptive
-
----
-
-## 📝 Project Structure
-
-```
-microservices-architecture/
-├── api-gateway/              # API Gateway service
-├── user-service/             # User management service
-├── product-service/          # Product catalog service
-├── order-service/            # Order processing service
-├── payment-service/          # Payment processing service
-├── notification-service/     # Notification service
-├── eureka-server/            # Service discovery
-├── config-server/            # Centralized configuration
-├── common-library/           # Shared utilities & DTOs
-├── k8s/                      # Kubernetes manifests
-│   ├── infrastructure/       # Infrastructure components
-│   └── services/             # Service deployments
-├── docker-compose.yml        # Local development setup
-├── pom.xml                   # Parent POM
-└── README.md                 # This file
-```
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-## 👨‍💻 Author
-
-**Gadige Peddaraju**
-
-- 🎓 B.Tech in Electrical & Electronics Engineering
-- 📧 Email: gadigeraju2003@gmail.com
-- 📱 Phone: +91 9390891145
-- 🔗 LinkedIn: [linkedin.com/in/yourprofile](https://linkedin.com/in/yourprofile)
-- 💻 GitHub: [github.com/yourusername](https://github.com/yourusername)
-
----
-
-## 🙏 Acknowledgments
-
-- Spring Boot & Spring Cloud teams for excellent frameworks
-- Open source community for amazing tools
-- Industry best practices from Martin Fowler, Chris Richardson, and others
-
----
-
-## 📚 Additional Resources
-
-- [Spring Boot Documentation](https://spring.io/projects/spring-boot)
-- [Spring Cloud Documentation](https://spring.io/projects/spring-cloud)
-- [Microservices Patterns](https://microservices.io/patterns/)
-- [Docker Documentation](https://docs.docker.com/)
-- [Kubernetes Documentation](https://kubernetes.io/docs/)
-
----
-
-## 🎯 Roadmap
-
-- [x] Basic microservices architecture
-- [x] Service discovery & API gateway
-- [x] Centralized configuration
-- [x] Monitoring & logging
-- [ ] GraphQL API support
-- [ ] Advanced security (OAuth 2.0, RBAC)
-- [ ] Auto-scaling with Kubernetes HPA
-- [ ] Multi-region deployment
-- [ ] Performance optimization
-- [ ] Cloud deployment (AWS/Azure/GCP)
-
----
-
-<div align="center">
-
-**⭐ Star this repository if you find it helpful!**
-
-Made with ❤️ by Gadige Peddaraju
-
-</div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gadige Peddaraju - Resume</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 30px;
+            overflow: hidden;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.3);
+            animation: slideIn 0.8s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Header Section */
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: backgroundMove 20s linear infinite;
+        }
+
+        @keyframes backgroundMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        .profile-img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 5px solid white;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            animation: pulse 2s infinite;
+            position: relative;
+            z-index: 1;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            animation: fadeInDown 1s ease;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header .tagline {
+            font-size: 1.3em;
+            opacity: 0.95;
+            animation: fadeInUp 1.2s ease;
+            position: relative;
+            z-index: 1;
+        }
+
+        .contact-info {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 1;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255,255,255,0.2);
+            padding: 10px 20px;
+            border-radius: 25px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            animation: fadeInUp 1.4s ease;
+        }
+
+        .contact-item:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-5px);
+        }
+
+        /* Section Styles */
+        .section {
+            padding: 50px 40px;
+            animation: fadeInUp 0.8s ease;
+        }
+
+        .section:nth-child(even) {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+
+        .section-title {
+            font-size: 2.2em;
+            margin-bottom: 30px;
+            color: #2d3748;
+            position: relative;
+            padding-bottom: 15px;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 2px;
+            animation: expand 1s ease;
+        }
+
+        @keyframes expand {
+            from { width: 0; }
+            to { width: 80px; }
+        }
+
+        .section-title i {
+            margin-right: 15px;
+            color: #667eea;
+        }
+
+        /* Objective */
+        .objective {
+            font-size: 1.1em;
+            line-height: 1.8;
+            color: #4a5568;
+            padding: 25px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-left: 5px solid #667eea;
+            animation: slideInLeft 1s ease;
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Education Cards */
+        .education-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .education-card {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 1s ease;
+        }
+
+        .education-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+
+        .education-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        .education-card h3 {
+            color: #667eea;
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        .education-card .institution {
+            color: #718096;
+            font-size: 1.1em;
+            margin-bottom: 15px;
+        }
+
+        .education-card .details {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px solid #e2e8f0;
+        }
+
+        .percentage-badge {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            animation: bounce 1s infinite alternate;
+        }
+
+        @keyframes bounce {
+            from { transform: translateY(0); }
+            to { transform: translateY(-5px); }
+        }
+
+        /* Skills Section */
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .skill-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            animation: scaleIn 0.6s ease;
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.5);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .skill-card:hover {
+            transform: translateY(-10px) rotate(3deg);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+        }
+
+        .skill-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: rotate 3s linear infinite;
+        }
+
+        @keyframes rotate {
+            0%, 100% { transform: rotateY(0deg); }
+            50% { transform: rotateY(180deg); }
+        }
+
+        .skill-name {
+            font-weight: bold;
+            color: #2d3748;
+            font-size: 1.1em;
+        }
+
+        /* Strengths */
+        .strengths-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .strength-item {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            animation: fadeIn 1s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .strength-item:hover {
+            transform: translateX(10px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .strength-icon {
+            font-size: 2em;
+            color: #667eea;
+            min-width: 50px;
+        }
+
+        /* Languages */
+        .languages-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .language-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .language-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+        }
+
+        .language-card:hover::before {
+            transform: translateY(0);
+        }
+
+        .language-flag {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+
+        .language-name {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+
+        .language-level {
+            color: #718096;
+            font-style: italic;
+        }
+
+        /* Project Section */
+        .project-card {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-top: 30px;
+            border-left: 8px solid #667eea;
+            animation: slideInRight 1s ease;
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .project-card h3 {
+            color: #667eea;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+        }
+
+        .project-card p {
+            color: #4a5568;
+            line-height: 1.8;
+            font-size: 1.1em;
+        }
+
+        .project-tags {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .tag {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            animation: fadeIn 1.5s ease;
+        }
+
+        /* Footer */
+        .footer {
+            background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .footer p {
+            margin: 10px 0;
+            opacity: 0.9;
+        }
+
+        /* Animations */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2em;
+            }
+            .section {
+                padding: 30px 20px;
+            }
+            .contact-info {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+
+        /* Scroll Animation */
+        .fade-in-section {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+
+        .fade-in-section.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="profile-img">
+                <i class="fas fa-user-tie"></i>
+            </div>
+            <h1>GADIGE PEDDARAJU</h1>
+            <p class="tagline">🚀 Full Stack Java Developer | Spring Boot Specialist | Database Expert</p>
+            <div class="contact-info">
+                <div class="contact-item">
+                    <i class="fas fa-envelope"></i>
+                    <span>gadigeraju2003@gmail.com</span>
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-phone"></i>
+                    <span>+91 9390891145</span>
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>Kurnool, Andhra Pradesh</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Career Objective -->
+        <div class="section fade-in-section">
+            <h2 class="section-title"><i class="fas fa-bullseye"></i>Career Objective</h2>
+            <div class="objective">
+                I aspire to work with innovative organizations where I can leverage my technical expertise in Java development to create impactful solutions. My goal is to continuously enhance my knowledge and skills while contributing to organizational growth through efficient, scalable, and high-quality software solutions. I am passionate about learning new technologies and delivering excellence in every project.
+            </div>
+        </div>
+
+        <!-- Education -->
+        <div class="section fade-in-section">
+            <h2 class="section-title"><i class="fas fa-graduation-cap"></i>Educational Qualifications</h2>
+            <div class="education-grid">
+                <div class="education-card">
+                    <h3><i class="fas fa-university"></i> B.TECH (EEE)</h3>
+                    <p class="institution">Jawaharlal Nehru Technological University</p>
+                    <p class="institution">Anantapur, Andhra Pradesh</p>
+                    <div class="details">
+                        <span><i class="fas fa-calendar"></i> 2025</span>
+                        <span class="percentage-badge">75%</span>
+                    </div>
+                </div>
+                <div class="education-card">
+                    <h3><i class="fas fa-school"></i> DIPLOMA (EEE)</h3>
+                    <p class="institution">State Board of Technical Education</p>
+                    <p class="institution">Andhra Pradesh</p>
+                    <div class="details">
+                        <span><i class="fas fa-calendar"></i> 2022</span>
+                        <span class="percentage-badge">71%</span>
+                    </div>
+                </div>
+                <div class="education-card">
+                    <h3><i class="fas fa-book"></i> SSC</h3>
+                    <p class="institution">Board of Secondary Education</p>
+                    <p class="institution">Andhra Pradesh</p>
+                    <div class="details">
+                        <span><i class="fas fa-calendar"></i> 2018</span>
+                        <span class="percentage-badge">65%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Technical Skills -->
+        <div class="section fade-in-section">
+            <h2 class="section-title"><i class="fas fa-code"></i>Technical Skills</h2>
+            <div class="skills-grid">
+                <div class="skill-card">
+                    <div class="skill-icon"><i class="fab fa-java"></i></div>
+                    <div class="skill-name">Java</div>
+                </div>
+                <div class="skill-card">
+                    <div class="skill-icon"><i class="fas fa-code-branch"></i></div>
+                    <div class="skill-name">Advanced Java</div>
+                </div>
+                <div class="skill-card">
+                    <div class="skill-icon"><i class="fas fa-database"></i></div>
+                    <div class="skill-name">Oracle</div>
+                </div>
+                <div class="skill-card">
+                    <div class="skill-icon"><i class="fab fa-html5"></i></div>
+                    <div class="skill-name">HTML</div>
+                </div>
+                <div class="skill-card">
+                    <div class="skill-icon"><i class="fab fa-css3-alt"></i></div>
+                    <div class="skill-name">CSS</div>
+                </div>
+                <div class="skill-card">
+                    <div class="skill-icon"><i class="fab fa-js"></i></div>
+                    <div class="skill-name">JavaScript</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Personal Skills & Strengths -->
+        <div class="section fade-in-section">
+            <h2 class="section-title"><i class="fas fa-star"></i>Core Strengths</h2>
+            <div class="strengths-container">
+                <div class="strength-item">
+                    <div class="strength-icon"><i class="fas fa-users"></i></div>
+                    <div>
+                        <strong>Team Work</strong>
+                        <p>Collaborate effectively with team members</p>
+                    </div>
+                </div>
+                <div class="strength-item">
+                    <div class="strength-icon"><i class="fas fa-comments"></i></div>
+                    <div>
+                        <strong>Communication</strong>
+                        <p>Excellent verbal and written skills</p>
+                    </div>
+                </div>
+                <div class="strength-item">
+                    <div class="strength-icon"><i class="fas fa-dumbbell"></i></div>
+                    <div>
+                        <strong>Hard Working</strong>
+                        <p>Dedicated and committed to excellence</p>
+                    </div>
+                </div>
+                <div class="strength-item">
+                    <div class="strength-icon"><i class="fas fa-clock"></i></div>
+                    <div>
+                        <strong>Time Management</strong>
+                        <p>Efficient task prioritization</p>
+                    </div>
+                </div>
+                <div class="strength-item">
+                    <div class="strength-icon"><i class="fas fa-brain"></i></div>
+                    <div>
+                        <strong>Fast Learner</strong>
+                        <p>Quick adaptation to new technologies</p>
+                    </div>
+                </div>
+                <div class="strength-item">
+                    <div class="strength-icon"><i class="fas fa-chart-line"></i></div>
+                    <div>
+                        <strong>Analytical Skills</strong>
+                        <p>Strong problem-solving abilities</p>
+                    </div>
+                </div>
+                <div class="strength-item">
+                    <div class="strength-icon"><i class="fas fa-sync-alt"></i></div>
+                    <div>
+                        <strong>Adaptable</strong>
+                        <p>Adjust to any environment quickly</p>
+                    </div>
+                </div>
+                <div class="strength-item">
+                    <div class="strength-icon"><i class="fas fa-medal"></i></div>
+                    <div>
+                        <strong>Confident</strong>
+                        <p>Self-assured professional approach</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Languages -->
+        <div class="section fade-in-section">
+            <h2 class="section-title"><i class="fas fa-language"></i>Languages Known</h2>
+            <div class="languages-grid">
+                <div class="language-card">
+                    <div class="language-flag">🇮🇳</div>
+                    <div class="language-name">Telugu</div>
+                    <div class="language-level">Native</div>
+                </div>
+                <div class="language-card">
+                    <div class="language-flag">🇮🇳</div>
+                    <div class="language-name">Kannada</div>
+                    <div class="language-level">Fluent</div>
+                </div>
+                <div class="language-card">
+                    <div class="language-flag">🇬🇧</div>
+                    <div class="language-name">English</div>
+                    <div class="language-level">Professional</div>
+                </div>
+                <div class="language-card">
+                    <div class="language-flag">🇮🇳</div>
+                    <div class="language-name">Hindi</div>
+                    <div class="language-level">Conversational</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Projects -->
+        <div class="section fade-in-section">
+            <h2 class="section-title"><i class="fas fa-project-diagram"></i>Featured Project</h2>
+            <div class="project-card">
+                <h3>⚡ Railway Electric Fault Detection and Predictive Maintenance System</h3>
+                <p>
+                    Developed an innovative IoT-enabled system to detect electrical faults in railway infrastructure and predict maintenance requirements using advanced analytics. The system monitors real-time electrical parameters, identifies potential issues before they escalate, and generates alerts for preventive maintenance. This project enhances railway safety, reduces downtime, and optimizes maintenance schedules.
+                </p>
+                <div class="project-tags">
+                    <span class="tag"><i class="fab fa-java"></i> Java</span>
+                    <span class="tag"><i class="fas fa-database"></i> Oracle</span>
+                    <span class="tag"><i class="fas fa-microchip"></i> IoT</span>
+                    <span class="tag"><i class="fas fa-chart-line"></i> Predictive Analytics</span>
+                    <span class="tag"><i class="fab fa-html5"></i> Web Interface</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <h3>📄 Declaration</h3>
+            <p>I hereby declare that all the information provided above is true to the best of my knowledge and belief.</p>
+            <br>
+            <p><strong>Date:</strong> January 2025</p>
+            <p><strong>Place:</strong> Kurnool, Andhra Pradesh</p>
+            <br>
+            <p><strong>GADIGE PEDDARAJU</strong></p>
+            <br>
+            <p style="opacity: 0.7;">Made with ❤️ and ☕</p>
+        </div>
+    </div>
+
+    <script>
+        // Intersection Observer for fade-in animations
+        const faders = document.querySelectorAll('.fade-in-section');
+
+        const appearOptions = {
+            threshold: 0.2,
+            rootMargin: "0px 0px -100px 0px"
+        };
+
+        const appearOnScroll = new IntersectionObserver(function(entries, appearOnScroll) {
+            entries.forEach(entry => {
+                if (!entry.isIntersecting) {
+                    return;
+                } else {
+                    entry.target.classList.add('is-visible');
+                    appearOnScroll.unobserve(entry.target);
+                }
+            });
+        }, appearOptions);
+
+        faders.forEach(fader => {
+            appearOnScroll.observe(fader);
+        });
+
+        // Skill card animation delays
+        const skillCards = document.querySelectorAll('.skill-card');
+        skillCards.forEach((card, index) => {
+            card.style.animationDelay = `${index * 0.1}s`;
+        });
+
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
