@@ -1,565 +1,595 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Microservices Architecture - Java Developer Portfolio</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+# 🚀 Enterprise Microservices Architecture
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-            overflow-x: hidden;
-        }
+[![Java](https://img.shields.io/badge/Java-17+-orange.svg)](https://www.oracle.com/java/)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2+-green.svg)](https://spring.io/projects/spring-boot)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-        }
+> A scalable, production-ready microservices architecture built with Java, Spring Boot, and Spring Cloud ecosystem.
 
-        h1 {
-            text-align: center;
-            color: #2d3748;
-            margin-bottom: 10px;
-            font-size: 2.5em;
-            animation: fadeInDown 0.8s ease;
-        }
+**Designed & Developed by:** [Gadige Peddaraju](https://github.com/yourusername)  
+**Tech Stack:** Java, Spring Boot, Oracle, Docker, Kubernetes
 
-        .subtitle {
-            text-align: center;
-            color: #718096;
-            margin-bottom: 40px;
-            font-size: 1.2em;
-            animation: fadeInDown 1s ease;
-        }
+---
 
-        .architecture-diagram {
-            position: relative;
-            padding: 40px 20px;
-            min-height: 800px;
-        }
+## 📋 Table of Contents
 
-        .layer {
-            margin-bottom: 60px;
-            animation: fadeInUp 1s ease;
-        }
+- [Overview](#overview)
+- [Architecture](#architecture)
+- [Microservices](#microservices)
+- [Technology Stack](#technology-stack)
+- [Getting Started](#getting-started)
+- [API Documentation](#api-documentation)
+- [Deployment](#deployment)
+- [Monitoring & Observability](#monitoring--observability)
+- [Contributing](#contributing)
+- [License](#license)
 
-        .layer-title {
-            text-align: center;
-            font-size: 1.3em;
-            color: #4a5568;
-            margin-bottom: 30px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
+---
 
-        .services-row {
-            display: flex;
-            justify-content: center;
-            gap: 30px;
-            flex-wrap: wrap;
-            position: relative;
-        }
+## 🎯 Overview
 
-        .service-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 15px;
-            padding: 25px;
-            width: 220px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            animation: bounceIn 0.8s ease;
-            position: relative;
-            overflow: hidden;
-        }
+This project demonstrates a **production-grade microservices architecture** implementing industry best practices for building scalable, resilient, and maintainable distributed systems. It showcases:
 
-        .service-card::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
+✅ **Service Discovery** with Netflix Eureka  
+✅ **API Gateway** for centralized routing & authentication  
+✅ **Distributed Configuration** with Spring Cloud Config  
+✅ **Inter-service Communication** via REST & messaging  
+✅ **Containerization** with Docker & orchestration with Kubernetes  
+✅ **Observability** through monitoring, logging, and tracing  
+✅ **Security** with JWT-based authentication & authorization  
 
-        .service-card:hover::before {
-            opacity: 1;
-            animation: ripple 1.5s ease;
-        }
+---
 
-        .service-card:hover {
-            transform: translateY(-10px) scale(1.05);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-        }
+## 🏗️ Architecture
 
-        .service-icon {
-            font-size: 2.5em;
-            text-align: center;
-            margin-bottom: 15px;
-            animation: pulse 2s infinite;
-        }
+### System Architecture Diagram
 
-        .service-name {
-            color: white;
-            font-size: 1.2em;
-            font-weight: 600;
-            text-align: center;
-            margin-bottom: 10px;
-        }
+```
+┌─────────────────────────────────────────────────────────────┐
+│                        Client Layer                          │
+│              (Web, Mobile, Third-party Apps)                 │
+└────────────────────┬────────────────────────────────────────┘
+                     │
+                     ▼
+┌─────────────────────────────────────────────────────────────┐
+│                      API Gateway                             │
+│         (Routing, Auth, Rate Limiting, Load Balancing)       │
+└─┬──────────┬──────────┬──────────┬──────────┬──────────────┘
+  │          │          │          │          │
+  ▼          ▼          ▼          ▼          ▼
+┌───────┐ ┌────────┐ ┌───────┐ ┌─────────┐ ┌──────────────┐
+│ User  │ │Product │ │ Order │ │ Payment │ │Notification  │
+│Service│ │Service │ │Service│ │ Service │ │   Service    │
+└───┬───┘ └───┬────┘ └───┬───┘ └────┬────┘ └──────┬───────┘
+    │         │          │          │             │
+    ▼         ▼          ▼          ▼             ▼
+┌────────┐ ┌────────┐ ┌────────┐ ┌────────┐  ┌─────────┐
+│User DB │ │Prod DB │ │Order DB│ │Pay DB  │  │ Kafka/  │
+│(Oracle)│ │(MySQL) │ │(Oracle)│ │(Oracle)│  │RabbitMQ │
+└────────┘ └────────┘ └────────┘ └────────┘  └─────────┘
+     │          │          │          │            │
+     └──────────┴──────────┴──────────┴────────────┘
+                         │
+                         ▼
+            ┌──────────────────────────┐
+            │  Infrastructure Layer     │
+            ├──────────────────────────┤
+            │ • Service Discovery       │
+            │ • Config Server          │
+            │ • Redis Cache            │
+            │ • Monitoring (Prometheus)│
+            │ • Logging (ELK Stack)    │
+            └──────────────────────────┘
+```
 
-        .service-tech {
-            color: rgba(255,255,255,0.9);
-            font-size: 0.85em;
-            text-align: center;
-            line-height: 1.5;
-        }
+### Key Design Patterns
 
-        .api-gateway {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            width: 300px;
-            margin: 0 auto 40px;
-        }
+- **API Gateway Pattern**: Single entry point for all clients
+- **Database per Service**: Each microservice owns its database
+- **Event-Driven Architecture**: Asynchronous communication via message queues
+- **Circuit Breaker**: Resilience4j for fault tolerance
+- **CQRS**: Separate read/write operations for scalability
+- **Saga Pattern**: Distributed transaction management
 
-        .database {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-        }
+---
 
-        .infrastructure {
-            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-        }
+## 🔧 Microservices
 
-        .connection-line {
-            position: absolute;
-            height: 2px;
-            background: linear-gradient(90deg, #667eea, #764ba2);
-            transform-origin: left center;
-            animation: drawLine 1.5s ease;
-            opacity: 0.6;
-        }
+### 1. **API Gateway Service**
+- **Port**: 8080
+- **Responsibilities**: 
+  - Request routing to appropriate microservices
+  - Authentication & authorization (JWT validation)
+  - Rate limiting & throttling
+  - Load balancing
+- **Tech**: Spring Cloud Gateway, JWT
 
-        .tech-stack {
-            margin-top: 50px;
-            padding: 30px;
-            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
-            border-radius: 15px;
-            animation: fadeInUp 1.2s ease;
-        }
+### 2. **User Service**
+- **Port**: 8081
+- **Responsibilities**: 
+  - User registration & authentication
+  - Profile management
+  - Role-based access control (RBAC)
+  - Password encryption (BCrypt)
+- **Database**: Oracle / PostgreSQL
+- **Endpoints**:
+  - `POST /api/users/register` - Register new user
+  - `POST /api/users/login` - User authentication
+  - `GET /api/users/{id}` - Get user profile
+  - `PUT /api/users/{id}` - Update user profile
 
-        .tech-stack h2 {
-            color: #2d3748;
-            margin-bottom: 20px;
-            text-align: center;
-        }
+### 3. **Product Service**
+- **Port**: 8082
+- **Responsibilities**: 
+  - Product catalog management
+  - Inventory tracking
+  - Product search & filtering
+  - Category management
+- **Database**: MySQL / Oracle
+- **Caching**: Redis for frequently accessed products
+- **Endpoints**:
+  - `GET /api/products` - Get all products (paginated)
+  - `GET /api/products/{id}` - Get product details
+  - `POST /api/products` - Create product (Admin)
+  - `PUT /api/products/{id}` - Update product (Admin)
+  - `DELETE /api/products/{id}` - Delete product (Admin)
 
-        .tech-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-        }
+### 4. **Order Service**
+- **Port**: 8083
+- **Responsibilities**: 
+  - Order creation & validation
+  - Order status management
+  - Inventory reservation
+  - Integration with Payment & Notification services
+- **Database**: PostgreSQL / Oracle
+- **Messaging**: Kafka for order events
+- **Endpoints**:
+  - `POST /api/orders` - Create new order
+  - `GET /api/orders/{id}` - Get order details
+  - `GET /api/orders/user/{userId}` - Get user orders
+  - `PUT /api/orders/{id}/status` - Update order status
 
-        .tech-item {
-            background: white;
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
-        }
+### 5. **Payment Service**
+- **Port**: 8084
+- **Responsibilities**: 
+  - Payment processing
+  - Payment gateway integration (Stripe, PayPal, Razorpay)
+  - Transaction history
+  - Refund management
+- **Database**: Oracle
+- **Security**: PCI-DSS compliant
+- **Endpoints**:
+  - `POST /api/payments/process` - Process payment
+  - `GET /api/payments/{id}` - Get payment details
+  - `POST /api/payments/{id}/refund` - Initiate refund
 
-        .tech-item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-        }
+### 6. **Notification Service**
+- **Port**: 8085
+- **Responsibilities**: 
+  - Email notifications (via SendGrid/SMTP)
+  - SMS notifications (via Twilio)
+  - Push notifications
+  - Event-driven notifications
+- **Messaging**: Kafka consumer for order/payment events
+- **Endpoints**:
+  - `POST /api/notifications/email` - Send email
+  - `POST /api/notifications/sms` - Send SMS
 
-        .tech-item strong {
-            color: #667eea;
-            display: block;
-            margin-bottom: 5px;
-        }
+---
 
-        @keyframes fadeInDown {
-            from {
-                opacity: 0;
-                transform: translateY(-30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+## 💻 Technology Stack
 
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+### Backend
+- **Java**: 17+ (LTS)
+- **Spring Boot**: 3.2+
+- **Spring Cloud**: 2023.x
+- **Spring Data JPA**: Database interactions
+- **Hibernate**: ORM
+- **Maven**: Build & dependency management
 
-        @keyframes bounceIn {
-            0% {
-                opacity: 0;
-                transform: scale(0.3);
-            }
-            50% {
-                transform: scale(1.05);
-            }
-            100% {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
+### Databases
+- **Oracle**: Primary relational database
+- **PostgreSQL**: Alternative RDBMS
+- **MySQL**: Product catalog
+- **MongoDB**: Document store (optional)
+- **Redis**: In-memory cache & session store
 
-        @keyframes pulse {
-            0%, 100% {
-                transform: scale(1);
-            }
-            50% {
-                transform: scale(1.1);
-            }
-        }
+### Messaging
+- **Apache Kafka**: Event streaming
+- **RabbitMQ**: Message queue (alternative)
 
-        @keyframes drawLine {
-            from {
-                width: 0;
-            }
-            to {
-                width: 100%;
-            }
-        }
+### Security
+- **Spring Security**: Authentication & authorization
+- **JWT**: Stateless authentication tokens
+- **OAuth 2.0**: Third-party authentication
+- **BCrypt**: Password hashing
 
-        @keyframes ripple {
-            0% {
-                transform: translate(-50%, -50%) scale(0);
-            }
-            100% {
-                transform: translate(-50%, -50%) scale(1);
-            }
-        }
+### DevOps & Infrastructure
+- **Docker**: Containerization
+- **Kubernetes**: Container orchestration
+- **Jenkins**: CI/CD pipeline
+- **Git**: Version control
+- **Nginx**: Reverse proxy & load balancing
 
-        .info-panel {
-            position: fixed;
-            right: -400px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 350px;
-            background: white;
-            padding: 30px;
-            border-radius: 15px 0 0 15px;
-            box-shadow: -5px 0 30px rgba(0,0,0,0.3);
-            transition: right 0.4s ease;
-            z-index: 1000;
-        }
+### Monitoring & Logging
+- **Prometheus**: Metrics collection
+- **Grafana**: Metrics visualization
+- **ELK Stack**: Centralized logging
+  - Elasticsearch: Log storage
+  - Logstash: Log processing
+  - Kibana: Log visualization
+- **Zipkin/Jaeger**: Distributed tracing
 
-        .info-panel.active {
-            right: 0;
-        }
+### Testing
+- **JUnit 5**: Unit testing
+- **Mockito**: Mocking framework
+- **TestContainers**: Integration testing
+- **Postman**: API testing
 
-        .info-panel h3 {
-            color: #667eea;
-            margin-bottom: 15px;
-        }
+---
 
-        .info-panel p {
-            color: #4a5568;
-            line-height: 1.6;
-            margin-bottom: 10px;
-        }
+## 🚀 Getting Started
 
-        .close-btn {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: #667eea;
-            color: white;
-            border: none;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 1.2em;
-            transition: all 0.3s ease;
-        }
+### Prerequisites
 
-        .close-btn:hover {
-            background: #764ba2;
-            transform: rotate(90deg);
-        }
+```bash
+# Required software
+- Java 17 or higher
+- Maven 3.8+
+- Docker & Docker Compose
+- Kubernetes (Minikube/Kind for local)
+- Oracle Database (or PostgreSQL)
+- Redis
+- Kafka
+```
 
-        .legend {
-            display: flex;
-            justify-content: center;
-            gap: 30px;
-            margin-top: 40px;
-            flex-wrap: wrap;
-        }
+### Installation
 
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+1. **Clone the repository**
+```bash
+git clone https://github.com/yourusername/microservices-architecture.git
+cd microservices-architecture
+```
 
-        .legend-color {
-            width: 30px;
-            height: 30px;
-            border-radius: 5px;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>🚀 Microservices Architecture Design</h1>
-        <p class="subtitle">Enterprise Java-Based System | Designed by Gadige Peddaraju</p>
+2. **Build all services**
+```bash
+mvn clean install -DskipTests
+```
 
-        <div class="architecture-diagram">
-            <!-- API Gateway Layer -->
-            <div class="layer">
-                <div class="layer-title">⚡ API Gateway Layer</div>
-                <div class="services-row">
-                    <div class="service-card api-gateway" onclick="showInfo('gateway')">
-                        <div class="service-icon">🌐</div>
-                        <div class="service-name">API Gateway</div>
-                        <div class="service-tech">Spring Cloud Gateway<br>Netflix Zuul<br>Authentication & Routing</div>
-                    </div>
-                </div>
-            </div>
+3. **Start infrastructure services using Docker Compose**
+```bash
+docker-compose up -d
+```
 
-            <!-- Microservices Layer -->
-            <div class="layer">
-                <div class="layer-title">🔧 Core Microservices</div>
-                <div class="services-row">
-                    <div class="service-card" onclick="showInfo('user')">
-                        <div class="service-icon">👤</div>
-                        <div class="service-name">User Service</div>
-                        <div class="service-tech">Spring Boot<br>JWT Authentication<br>User Management</div>
-                    </div>
-                    <div class="service-card" onclick="showInfo('product')">
-                        <div class="service-icon">📦</div>
-                        <div class="service-name">Product Service</div>
-                        <div class="service-tech">Spring Boot<br>REST APIs<br>Catalog Management</div>
-                    </div>
-                    <div class="service-card" onclick="showInfo('order')">
-                        <div class="service-icon">🛒</div>
-                        <div class="service-name">Order Service</div>
-                        <div class="service-tech">Spring Boot<br>Transaction Management<br>Order Processing</div>
-                    </div>
-                    <div class="service-card" onclick="showInfo('payment')">
-                        <div class="service-icon">💳</div>
-                        <div class="service-name">Payment Service</div>
-                        <div class="service-tech">Spring Boot<br>Payment Gateway Integration<br>Secure Transactions</div>
-                    </div>
-                    <div class="service-card" onclick="showInfo('notification')">
-                        <div class="service-icon">📧</div>
-                        <div class="service-name">Notification Service</div>
-                        <div class="service-tech">Spring Boot<br>Email/SMS APIs<br>Event-Driven</div>
-                    </div>
-                </div>
-            </div>
+This will start:
+- Eureka Server (http://localhost:8761)
+- Config Server (http://localhost:8888)
+- Kafka & Zookeeper
+- Redis
+- Databases (Oracle, MySQL, PostgreSQL)
 
-            <!-- Database Layer -->
-            <div class="layer">
-                <div class="layer-title">💾 Data Layer</div>
-                <div class="services-row">
-                    <div class="service-card database" onclick="showInfo('userdb')">
-                        <div class="service-icon">🗄️</div>
-                        <div class="service-name">User DB</div>
-                        <div class="service-tech">Oracle / PostgreSQL<br>User Data</div>
-                    </div>
-                    <div class="service-card database" onclick="showInfo('productdb')">
-                        <div class="service-icon">🗄️</div>
-                        <div class="service-name">Product DB</div>
-                        <div class="service-tech">Oracle / MySQL<br>Product Catalog</div>
-                    </div>
-                    <div class="service-card database" onclick="showInfo('orderdb')">
-                        <div class="service-icon">🗄️</div>
-                        <div class="service-name">Order DB</div>
-                        <div class="service-tech">Oracle / PostgreSQL<br>Order History</div>
-                    </div>
-                    <div class="service-card database" onclick="showInfo('cache')">
-                        <div class="service-icon">⚡</div>
-                        <div class="service-name">Redis Cache</div>
-                        <div class="service-tech">In-Memory Cache<br>Session Management</div>
-                    </div>
-                </div>
-            </div>
+4. **Run individual microservices**
 
-            <!-- Infrastructure Layer -->
-            <div class="layer">
-                <div class="layer-title">🏗️ Infrastructure & DevOps</div>
-                <div class="services-row">
-                    <div class="service-card infrastructure" onclick="showInfo('eureka')">
-                        <div class="service-icon">🔍</div>
-                        <div class="service-name">Service Discovery</div>
-                        <div class="service-tech">Eureka Server<br>Service Registry</div>
-                    </div>
-                    <div class="service-card infrastructure" onclick="showInfo('config')">
-                        <div class="service-icon">⚙️</div>
-                        <div class="service-name">Config Server</div>
-                        <div class="service-tech">Spring Cloud Config<br>Centralized Configuration</div>
-                    </div>
-                    <div class="service-card infrastructure" onclick="showInfo('monitor')">
-                        <div class="service-icon">📊</div>
-                        <div class="service-name">Monitoring</div>
-                        <div class="service-tech">Prometheus<br>Grafana<br>ELK Stack</div>
-                    </div>
-                </div>
-            </div>
-        </div>
+```bash
+# User Service
+cd user-service
+mvn spring-boot:run
 
-        <!-- Tech Stack Section -->
-        <div class="tech-stack">
-            <h2>🛠️ Technology Stack</h2>
-            <div class="tech-grid">
-                <div class="tech-item">
-                    <strong>Backend</strong>
-                    Java 17+, Spring Boot, Spring Cloud
-                </div>
-                <div class="tech-item">
-                    <strong>Database</strong>
-                    Oracle, PostgreSQL, MySQL, MongoDB
-                </div>
-                <div class="tech-item">
-                    <strong>Frontend</strong>
-                    HTML5, CSS3, JavaScript, React
-                </div>
-                <div class="tech-item">
-                    <strong>Messaging</strong>
-                    Apache Kafka, RabbitMQ
-                </div>
-                <div class="tech-item">
-                    <strong>Containerization</strong>
-                    Docker, Kubernetes
-                </div>
-                <div class="tech-item">
-                    <strong>CI/CD</strong>
-                    Jenkins, GitLab CI, GitHub Actions
-                </div>
-            </div>
-        </div>
+# Product Service
+cd product-service
+mvn spring-boot:run
 
-        <!-- Legend -->
-        <div class="legend">
-            <div class="legend-item">
-                <div class="legend-color" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"></div>
-                <span>Microservices</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);"></div>
-                <span>Databases</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);"></div>
-                <span>Infrastructure</span>
-            </div>
-        </div>
-    </div>
+# Order Service
+cd order-service
+mvn spring-boot:run
 
-    <!-- Info Panel -->
-    <div class="info-panel" id="infoPanel">
-        <button class="close-btn" onclick="closeInfo()">×</button>
-        <h3 id="infoTitle">Service Details</h3>
-        <p id="infoContent"></p>
-    </div>
+# Payment Service
+cd payment-service
+mvn spring-boot:run
 
-    <script>
-        const serviceInfo = {
-            gateway: {
-                title: '🌐 API Gateway',
-                content: 'Central entry point for all client requests. Handles authentication, rate limiting, load balancing, and routes requests to appropriate microservices. Built with Spring Cloud Gateway or Netflix Zuul.'
-            },
-            user: {
-                title: '👤 User Service',
-                content: 'Manages user registration, authentication, profile management, and authorization. Implements JWT-based security, password encryption, and role-based access control (RBAC).'
-            },
-            product: {
-                title: '📦 Product Service',
-                content: 'Handles product catalog, inventory management, product search, and filtering. Provides REST APIs for product CRUD operations with caching for performance optimization.'
-            },
-            order: {
-                title: '🛒 Order Service',
-                content: 'Manages order lifecycle from creation to fulfillment. Handles order validation, inventory checks, order status updates, and integrates with payment and notification services.'
-            },
-            payment: {
-                title: '💳 Payment Service',
-                content: 'Processes payments securely through integrated payment gateways. Handles payment validation, transaction history, refunds, and complies with PCI-DSS standards.'
-            },
-            notification: {
-                title: '📧 Notification Service',
-                content: 'Sends notifications via email, SMS, and push notifications. Event-driven architecture using message queues (Kafka/RabbitMQ) for asynchronous communication.'
-            },
-            userdb: {
-                title: '🗄️ User Database',
-                content: 'Stores user credentials, profiles, preferences, and authentication tokens. Uses Oracle or PostgreSQL with encryption for sensitive data.'
-            },
-            productdb: {
-                title: '🗄️ Product Database',
-                content: 'Maintains product catalog, inventory levels, pricing, and product attributes. Optimized for read-heavy operations with proper indexing.'
-            },
-            orderdb: {
-                title: '🗄️ Order Database',
-                content: 'Stores order details, transaction history, and order status. Ensures ACID properties for transactional consistency.'
-            },
-            cache: {
-                title: '⚡ Redis Cache',
-                content: 'In-memory data store for caching frequently accessed data, session management, and real-time analytics. Improves response time significantly.'
-            },
-            eureka: {
-                title: '🔍 Service Discovery',
-                content: 'Netflix Eureka server for service registration and discovery. Enables dynamic service location and load balancing without hard-coded URLs.'
-            },
-            config: {
-                title: '⚙️ Config Server',
-                content: 'Centralized configuration management using Spring Cloud Config. Supports environment-specific configs and hot-reloading without service restart.'
-            },
-            monitor: {
-                title: '📊 Monitoring & Logging',
-                content: 'Comprehensive monitoring using Prometheus for metrics, Grafana for visualization, and ELK Stack (Elasticsearch, Logstash, Kibana) for centralized logging and analysis.'
-            }
-        };
+# Notification Service
+cd notification-service
+mvn spring-boot:run
 
-        function showInfo(service) {
-            const panel = document.getElementById('infoPanel');
-            const title = document.getElementById('infoTitle');
-            const content = document.getElementById('infoContent');
-            
-            if (serviceInfo[service]) {
-                title.textContent = serviceInfo[service].title;
-                content.textContent = serviceInfo[service].content;
-                panel.classList.add('active');
-            }
-        }
+# API Gateway
+cd api-gateway
+mvn spring-boot:run
+```
 
-        function closeInfo() {
-            document.getElementById('infoPanel').classList.remove('active');
-        }
+5. **Access the application**
+- API Gateway: http://localhost:8080
+- Eureka Dashboard: http://localhost:8761
+- Config Server: http://localhost:8888
 
-        // Add stagger animation to service cards
-        document.addEventListener('DOMContentLoaded', () => {
-            const cards = document.querySelectorAll('.service-card');
-            cards.forEach((card, index) => {
-                card.style.animationDelay = `${index * 0.1}s`;
-            });
-        });
-    </script>
-</body>
-</html>
+---
+
+## 📚 API Documentation
+
+### Authentication
+
+All protected endpoints require JWT token in the Authorization header:
+
+```http
+Authorization: Bearer <your-jwt-token>
+```
+
+### Sample API Requests
+
+#### 1. User Registration
+```bash
+curl -X POST http://localhost:8080/api/users/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "johndoe",
+    "email": "john@example.com",
+    "password": "SecurePass123",
+    "firstName": "John",
+    "lastName": "Doe"
+  }'
+```
+
+#### 2. User Login
+```bash
+curl -X POST http://localhost:8080/api/users/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "johndoe",
+    "password": "SecurePass123"
+  }'
+```
+
+#### 3. Get Products
+```bash
+curl -X GET http://localhost:8080/api/products?page=0&size=10 \
+  -H "Authorization: Bearer <token>"
+```
+
+#### 4. Create Order
+```bash
+curl -X POST http://localhost:8080/api/orders \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <token>" \
+  -d '{
+    "userId": 1,
+    "items": [
+      {"productId": 101, "quantity": 2},
+      {"productId": 102, "quantity": 1}
+    ],
+    "shippingAddress": "123 Main St, City, Country"
+  }'
+```
+
+**Full API Documentation**: Available at http://localhost:8080/swagger-ui.html
+
+---
+
+## 🐳 Deployment
+
+### Docker Deployment
+
+Build Docker images for all services:
+
+```bash
+# Build images
+docker build -t user-service:1.0 ./user-service
+docker build -t product-service:1.0 ./product-service
+docker build -t order-service:1.0 ./order-service
+docker build -t payment-service:1.0 ./payment-service
+docker build -t notification-service:1.0 ./notification-service
+docker build -t api-gateway:1.0 ./api-gateway
+
+# Run with Docker Compose
+docker-compose up -d
+```
+
+### Kubernetes Deployment
+
+```bash
+# Create namespace
+kubectl create namespace microservices
+
+# Deploy infrastructure
+kubectl apply -f k8s/infrastructure/
+
+# Deploy services
+kubectl apply -f k8s/services/
+
+# Verify deployments
+kubectl get pods -n microservices
+kubectl get services -n microservices
+```
+
+### Environment Variables
+
+Create `.env` file for each service:
+
+```env
+# Database Configuration
+DB_HOST=localhost
+DB_PORT=1521
+DB_NAME=microservicesdb
+DB_USERNAME=admin
+DB_PASSWORD=secure_password
+
+# Redis Configuration
+REDIS_HOST=localhost
+REDIS_PORT=6379
+
+# Kafka Configuration
+KAFKA_BOOTSTRAP_SERVERS=localhost:9092
+
+# JWT Configuration
+JWT_SECRET=your-secret-key-here
+JWT_EXPIRATION=86400000
+
+# Email Configuration
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USERNAME=your-email@gmail.com
+SMTP_PASSWORD=your-password
+```
+
+---
+
+## 📊 Monitoring & Observability
+
+### Prometheus Metrics
+Access metrics at: http://localhost:9090
+
+Key metrics monitored:
+- Request rate & latency
+- Error rates (4xx, 5xx)
+- JVM memory & CPU usage
+- Database connection pool stats
+- Cache hit/miss ratio
+
+### Grafana Dashboards
+Access dashboards at: http://localhost:3000 (admin/admin)
+
+Pre-configured dashboards:
+- Service health overview
+- API Gateway metrics
+- Database performance
+- Kafka consumer lag
+- JVM monitoring
+
+### Centralized Logging (ELK)
+Access Kibana at: http://localhost:5601
+
+Log aggregation from all services with:
+- Request/response logs
+- Error stack traces
+- Performance metrics
+- Audit logs
+
+### Distributed Tracing
+Access Zipkin at: http://localhost:9411
+
+Trace requests across microservices to identify:
+- Latency bottlenecks
+- Service dependencies
+- Error propagation
+
+---
+
+## 🧪 Testing
+
+### Run Unit Tests
+```bash
+mvn test
+```
+
+### Run Integration Tests
+```bash
+mvn verify -P integration-tests
+```
+
+### Run All Tests with Coverage
+```bash
+mvn clean verify jacoco:report
+```
+
+View coverage report at: `target/site/jacoco/index.html`
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please follow these steps:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+Please ensure:
+- Code follows Java coding standards
+- All tests pass
+- Documentation is updated
+- Commit messages are descriptive
+
+---
+
+## 📝 Project Structure
+
+```
+microservices-architecture/
+├── api-gateway/              # API Gateway service
+├── user-service/             # User management service
+├── product-service/          # Product catalog service
+├── order-service/            # Order processing service
+├── payment-service/          # Payment processing service
+├── notification-service/     # Notification service
+├── eureka-server/            # Service discovery
+├── config-server/            # Centralized configuration
+├── common-library/           # Shared utilities & DTOs
+├── k8s/                      # Kubernetes manifests
+│   ├── infrastructure/       # Infrastructure components
+│   └── services/             # Service deployments
+├── docker-compose.yml        # Local development setup
+├── pom.xml                   # Parent POM
+└── README.md                 # This file
+```
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## 👨‍💻 Author
+
+**Gadige Peddaraju**
+
+- 🎓 B.Tech in Electrical & Electronics Engineering
+- 📧 Email: gadigeraju2003@gmail.com
+- 📱 Phone: +91 9390891145
+- 🔗 LinkedIn: [linkedin.com/in/yourprofile](https://linkedin.com/in/yourprofile)
+- 💻 GitHub: [github.com/yourusername](https://github.com/yourusername)
+
+---
+
+## 🙏 Acknowledgments
+
+- Spring Boot & Spring Cloud teams for excellent frameworks
+- Open source community for amazing tools
+- Industry best practices from Martin Fowler, Chris Richardson, and others
+
+---
+
+## 📚 Additional Resources
+
+- [Spring Boot Documentation](https://spring.io/projects/spring-boot)
+- [Spring Cloud Documentation](https://spring.io/projects/spring-cloud)
+- [Microservices Patterns](https://microservices.io/patterns/)
+- [Docker Documentation](https://docs.docker.com/)
+- [Kubernetes Documentation](https://kubernetes.io/docs/)
+
+---
+
+## 🎯 Roadmap
+
+- [x] Basic microservices architecture
+- [x] Service discovery & API gateway
+- [x] Centralized configuration
+- [x] Monitoring & logging
+- [ ] GraphQL API support
+- [ ] Advanced security (OAuth 2.0, RBAC)
+- [ ] Auto-scaling with Kubernetes HPA
+- [ ] Multi-region deployment
+- [ ] Performance optimization
+- [ ] Cloud deployment (AWS/Azure/GCP)
+
+---
+
+<div align="center">
+
+**⭐ Star this repository if you find it helpful!**
+
+Made with ❤️ by Gadige Peddaraju
+
+</div>
