@@ -25,7 +25,7 @@ const careerGoal = {
     passion: "Software Development & Innovation",
     mission: "Building scalable enterprise solutions",
     expertise: ["Java", "Spring Boot", "Oracle", "Full Stack Development"],
-    mindset: "Continuous learning and growth",
+    mindset: "Continuous learning & growth",
     commitment: "Delivering excellence in every project"
 };
 
