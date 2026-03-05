@@ -68,7 +68,7 @@ Andhra Pradesh
 Andhra Pradesh
 
 📅 **Year:** 2018  
-🎯 **Percentage:** 65%
+🎯 **Percentage:** 70%
 
 ![](https://img.shields.io/badge/Status-Completed-orange?style=flat-square)
 
