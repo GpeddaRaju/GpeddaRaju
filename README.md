@@ -219,7 +219,7 @@ Andhra Pradesh
 | 🗣️ Language | 📊 Proficiency Level | 💬 Usage |
 |:-----------|:-------------------|:---------|
 | **🇮🇳 Telugu** | ![](https://img.shields.io/badge/Native-100%25-success?style=flat-square) | Mother Tongue |
-| **🇮🇳 Kannada** | ![](https://img.shields.io/badge/Fluent-90%25-blue?style=flat-square) | Fluent Speaker |
+| **🇮🇳 Kannada** | ![](https://img.shields.io/badge/Fluent-100%25-blue?style=flat-square) | Fluent Speaker |
 | **🇬🇧 English** | ![](https://img.shields.io/badge/Professional-85%25-informational?style=flat-square) | Professional Working |
 | **🇮🇳 Hindi** | ![](https://img.shields.io/badge/Conversational-80%25-orange?style=flat-square) | Daily Communication |
 
